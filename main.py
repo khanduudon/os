@@ -2,10 +2,24 @@ import telebot
 import requests
 import json
 import re
+from flask import Flask #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+from telebot.apihelper import ApiTelegramException #𓍯𝙎𝙪𝙟𝙖𝙡⚝
 
 # ----------------------- CONFIG -----------------------
 TOKEN = "8266651898:AAFTdgzKg9Cse8Wzw8aoH6XuDJ7TZ2-RefU"  # Replace with your bot token
 bot = telebot.TeleBot(TOKEN, parse_mode="Markdown")
+
+app = Flask("render_web") #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+def safe_send(send_func, *args, **kwargs): #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    try: #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        return send_func(*args, **kwargs) #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    except Exception as e: #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        print(f"[safe_send error] {e}") #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        return None #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+
+@app.route("/") #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+def home(): #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    return "✅ Bot is running on Render!" #𓍯𝙎𝙪𝙟𝙖𝙡⚝
 
 BASE_API = "https://api.b77bf911.workers.dev"
 ENDPOINTS = {
@@ -125,6 +139,20 @@ def handle_input(msg):
     user_state.pop(user_id)
 
 # ----------------------- RUN -----------------------
-if __name__ == "__main__":
-    print("Bot Running...")
-    bot.polling(non_stop=True)
+if __name__ == "__main__": #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    logging.info("Bot starting...") #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+
+    # Flask को separate thread में चलाओ ताकि Render port detect कर सके #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    def run_flask(): #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        port = int(os.environ.get("PORT", 10000)) #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        app.run(host="0.0.0.0", port=port) #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+
+    Thread(target=run_flask, daemon=True).start() #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+
+    # Bot start #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    try: #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        bot.infinity_polling(timeout=60, long_polling_timeout=60) #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    except KeyboardInterrupt: #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        logging.info("Bot stopped by user.") #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+    except Exception: #𓍯𝙎𝙪𝙟𝙖𝙡⚝
+        logging.exception("Bot crashed") #𓍯𝙎𝙪𝙟𝙖𝙡⚝

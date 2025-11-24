@@ -1,3 +1,4 @@
+import os
 import logging
 from threading import Thread
 import telebot
